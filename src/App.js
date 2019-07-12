@@ -24,7 +24,12 @@ class App extends React.Component {
       .then(data => {
         console.log(data)
         this.setState((prevState) => {
-          prevState.QuestionsArray = data.results;
+          let results = [...data.results];
+          results.map((x) => {
+            x.options = [...x.incorrect_answers, x.correct_answer]
+            return x;
+          })
+          prevState.QuestionsArray = results;
           prevState.length = data.results.length;
           prevState.currentIndex = 0;
           return prevState;
@@ -43,7 +48,14 @@ class App extends React.Component {
           <Row>
             <Col sm={12} lg={12}>
               {/* HERE GOES BOX CONTAINER */}
-              <Box question={this.state.length ? this.state.QuestionsArray[0].question : ""}></Box>
+              <Box
+                question={
+                  this.state.length ? this.state.QuestionsArray[0].question : ""
+                }
+                answerList={
+                  this.state.length ? this.state.QuestionsArray[0].options : []
+                }
+              ></Box>
             </Col>
           </Row>
           <hr />

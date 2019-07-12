@@ -1,0 +1,9 @@
+.list-group {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.list-group-item:hover {
+    background: lightgray;
+    cursor: pointer;
+}
