@@ -7,3 +7,11 @@
     background: lightgray;
     cursor: pointer;
 }
+
+.correct {
+    background-color: lightgreen !important;
+}
+
+.incorrect {
+    background-color: lightcoral !important;
+}

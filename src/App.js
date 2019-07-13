@@ -3,6 +3,7 @@ import "./App.css";
 import Header from "./HeaderComponent";
 import { Container, Row, Col } from "react-bootstrap";
 import Box from "./BoxContainer";
+import _ from "lodash";
 class App extends React.Component {
 
   constructor() {
@@ -29,6 +30,8 @@ class App extends React.Component {
           let results = [...data.results];
           results.map((x) => {
             x.options = [...x.incorrect_answers, x.correct_answer]
+            // need to shuffle results
+            x.options = _.shuffle(x.options)
             x.isAnswered = false;
             return x;
           })
@@ -80,6 +83,8 @@ class App extends React.Component {
                 question={
                   this.state.length ? this.state.QuestionsArray[this.state.currentIndex].question : ""
                 }
+                correct_answer={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].correct_answer : ""
+                }
                 answerList={
                   this.state.length ? this.state.QuestionsArray[this.state.currentIndex].options : []
                 }
@@ -90,6 +95,8 @@ class App extends React.Component {
                 isAnswered={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].isAnswered : false
                 }
                 setAnswered={this.setAnswered}
+                answerString={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].answer : ""
+                }
               ></Box>
             </Col>
           </Row>

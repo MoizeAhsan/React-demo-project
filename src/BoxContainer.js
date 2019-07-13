@@ -32,17 +32,29 @@ class Box extends Component {
                     answerString: "",
                 }
             })
-            this.props.incrementCounter()
         }
 
     }
     render() {
+        const setVariantClass = (answer) => {
+            if (this.props.isAnswered) {
+                if (answer === this.props.answerString) {
+                    if (answer === this.props.correct_answer) return "correct"
+                    return "incorrect"
+                }
+                if (answer === this.props.correct_answer) {
+                    return "correct"
+                }
+            }
+            return ""
+        }
         const answerList = this.props.answerList ? this.props.answerList.map((x, idx) => {
             return (
                 <ListGroupItem
                     key={idx}
                     active={this.state.selectedIndex === null ? false : this.state.selectedIndex === idx ? true : false}
                     disabled={this.props.isAnswered}
+                    className={setVariantClass(x)}
                     onClick={() => { this.handleClick(idx, x) }}>{x}</ListGroupItem>
             )
         }) : <h1> Loading...</h1>
