@@ -36,8 +36,15 @@ class Box extends Component {
                     </ListGroup>
                 </Jumbotron>
                 <Col >
-                    <Button className="col-xs-12 col-sm-6 col-lg-6">A</Button>
-                    <Button className='col-xs-12 col-sm-6 col-lg-6' variant='success'>B</Button>
+                    <Button
+                        className="col-xs-12 col-sm-6 col-lg-6"
+                        onClick={this.props.decrementCounter}
+                        disabled={this.props.canBack}>Back</Button>
+                    <Button
+                        className='col-xs-12 col-sm-6 col-lg-6'
+                        variant='success'
+                        onClick={this.props.incrementCounter}
+                        disabled={!this.props.canForward}>Submit</Button>
                 </Col>
             </Container >
         );

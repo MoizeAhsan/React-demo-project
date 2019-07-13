@@ -12,6 +12,8 @@ class App extends React.Component {
       length: 0,
       currentIndex: null
     }
+    this.incrementCounter = this.incrementCounter.bind(this);
+    this.decrementCounter = this.decrementCounter.bind(this);
 
   }
   componentDidMount() {
@@ -37,6 +39,24 @@ class App extends React.Component {
         })
       })
   }
+  incrementCounter() {
+    this.setState((prevState) => {
+      return {
+        currentIndex: Math.min(prevState.currentIndex + 1, this.state.length - 1)
+      }
+    })
+  }
+  decrementCounter() {
+    this.setState((prevState) => {
+      console.log(Math.max(prevState.currentIndex - 1, 0));
+      return {
+        currentIndex: Math.max(prevState.currentIndex - 1, 0)
+      }
+    })
+  }
+  componentWillUnmount() {
+    console.log('asdf')
+  }
   render() {
     return (
       <div className="App">
@@ -50,11 +70,15 @@ class App extends React.Component {
               {/* HERE GOES BOX CONTAINER */}
               <Box
                 question={
-                  this.state.length ? this.state.QuestionsArray[0].question : ""
+                  this.state.length ? this.state.QuestionsArray[this.state.currentIndex].question : ""
                 }
                 answerList={
-                  this.state.length ? this.state.QuestionsArray[0].options : []
+                  this.state.length ? this.state.QuestionsArray[this.state.currentIndex].options : []
                 }
+                incrementCounter={this.incrementCounter}
+                decrementCounter={this.decrementCounter}
+                canBack={this.state.currentIndex === 0}
+                canForward={this.state.currentIndex !== this.state.length - 1}
               ></Box>
             </Col>
           </Row>
