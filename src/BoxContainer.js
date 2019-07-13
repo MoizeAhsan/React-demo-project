@@ -42,6 +42,7 @@ class Box extends Component {
                 <ListGroupItem
                     key={idx}
                     active={this.state.selectedIndex === null ? false : this.state.selectedIndex === idx ? true : false}
+                    disabled={this.props.isAnswered}
                     onClick={() => { this.handleClick(idx, x) }}>{x}</ListGroupItem>
             )
         }) : <h1> Loading...</h1>
