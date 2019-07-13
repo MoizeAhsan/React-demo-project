@@ -14,6 +14,7 @@ class App extends React.Component {
     }
     this.incrementCounter = this.incrementCounter.bind(this);
     this.decrementCounter = this.decrementCounter.bind(this);
+    this.setAnswered = this.setAnswered.bind(this);
 
   }
   componentDidMount() {
@@ -24,11 +25,11 @@ class App extends React.Component {
         return resp.json();
       })
       .then(data => {
-        console.log(data)
         this.setState((prevState) => {
           let results = [...data.results];
           results.map((x) => {
             x.options = [...x.incorrect_answers, x.correct_answer]
+            x.isAnswered = false;
             return x;
           })
           prevState.QuestionsArray = results;
@@ -48,14 +49,20 @@ class App extends React.Component {
   }
   decrementCounter() {
     this.setState((prevState) => {
-      console.log(Math.max(prevState.currentIndex - 1, 0));
       return {
         currentIndex: Math.max(prevState.currentIndex - 1, 0)
       }
     })
   }
-  componentWillUnmount() {
-    console.log('asdf')
+  setAnswered(idx, selectedAnswer) {
+    this.setState((prevState) => {
+      let questionsList = [...prevState.QuestionsArray]
+      questionsList[idx].isAnswered = true;
+      questionsList[idx].answer = selectedAnswer;
+      return {
+        QuestionsArray: questionsList
+      }
+    })
   }
   render() {
     return (
@@ -69,6 +76,7 @@ class App extends React.Component {
             <Col sm={12} lg={12}>
               {/* HERE GOES BOX CONTAINER */}
               <Box
+                currentQuesitonIndex={this.state.currentIndex}
                 question={
                   this.state.length ? this.state.QuestionsArray[this.state.currentIndex].question : ""
                 }
@@ -79,6 +87,9 @@ class App extends React.Component {
                 decrementCounter={this.decrementCounter}
                 canBack={this.state.currentIndex === 0}
                 canForward={this.state.currentIndex !== this.state.length - 1}
+                isAnswered={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].isAnswered : false
+                }
+                setAnswered={this.setAnswered}
               ></Box>
             </Col>
           </Row>

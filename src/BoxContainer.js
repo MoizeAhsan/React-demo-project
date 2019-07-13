@@ -5,16 +5,36 @@ class Box extends Component {
     constructor() {
         super();
         this.state = {
-            selectedIndex: null
+            selectedIndex: null,
+            answerString: ""
         }
         this.handleClick = this.handleClick.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
-    handleClick(idx) {
+    handleClick(idx, answerString) {
         this.setState(() => {
             return {
-                selectedIndex: idx
+                selectedIndex: idx,
+                answerString
             }
         })
+    }
+    handleSubmit() {
+        if (this.props.isAnswered) {
+            this.props.incrementCounter();
+        }
+        if (this.state.selectedIndex !== null) {
+            let idx = this.props.currentQuesitonIndex;
+            this.props.setAnswered(idx, this.state.answerString)
+            this.setState(() => {
+                return {
+                    selectedIndex: null,
+                    answerString: "",
+                }
+            })
+            this.props.incrementCounter()
+        }
+
     }
     render() {
         const answerList = this.props.answerList ? this.props.answerList.map((x, idx) => {
@@ -22,9 +42,18 @@ class Box extends Component {
                 <ListGroupItem
                     key={idx}
                     active={this.state.selectedIndex === null ? false : this.state.selectedIndex === idx ? true : false}
-                    onClick={() => { this.handleClick(idx) }}>{x}</ListGroupItem>
+                    onClick={() => { this.handleClick(idx, x) }}>{x}</ListGroupItem>
             )
         }) : <h1> Loading...</h1>
+
+        let SubmitButton = true;
+        if (!this.props.isAnswered && (this.state.selectedIndex !== null)) {
+            SubmitButton = false; // do not disable
+        }
+        if (this.props.isAnswered && this.props.canForward) {
+            SubmitButton = false; // do not disable
+        }
+
         return (
             <Container>
                 <Jumbotron fluid>
@@ -43,8 +72,8 @@ class Box extends Component {
                     <Button
                         className='col-xs-12 col-sm-6 col-lg-6'
                         variant='success'
-                        onClick={this.props.incrementCounter}
-                        disabled={!this.props.canForward}>Submit</Button>
+                        onClick={this.handleSubmit}
+                        disabled={SubmitButton}>{this.props.isAnswered ? "Next" : "Submit"}</Button>
                 </Col>
             </Container >
         );
