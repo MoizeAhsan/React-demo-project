@@ -5,49 +5,30 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import Box from "./BoxContainer";
 import _ from "lodash";
 import InfoBar from "./QuestionInfoComponent";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 class App extends React.Component {
 
   constructor() {
     super();
     this.state = {
       QuestionsArray: [],
-      length: 0,
+      length: 10,
       currentIndex: null,
       renderBox: false,
-      correctAnswerCount: 0
+      correctAnswerCount: 0,
+      isLoading: false
     }
     this.incrementCounter = this.incrementCounter.bind(this);
     this.decrementCounter = this.decrementCounter.bind(this);
     this.setAnswered = this.setAnswered.bind(this);
     this.renderBox = this.renderBox.bind(this);
-    this.setRenderBox = this.setRenderBox.bind(this)
+    this.setRenderBox = this.setRenderBox.bind(this);
+    this.setUpQuiz = this.setUpQuiz.bind(this);
   }
 
   componentDidMount() {
-    fetch("https://opentdb.com/api.php?amount=10&type=multiple", {
-      method: "get"
-    })
-      .then(resp => {
-        return resp.json();
-      })
-      .then(data => {
-        this.setState((prevState) => {
-          let results = [...data.results];
-          results.map((x) => {
-            x.options = [...x.incorrect_answers, x.correct_answer]
-            // need to shuffle results
-            x.options = _.shuffle(x.options)
-            x.isAnswered = false;
-            return x;
-          })
-          prevState.QuestionsArray = results;
-          prevState.length = data.results.length;
-          prevState.currentIndex = 0;
-          prevState.isCorrect = false;
-          return prevState;
 
-        })
-      })
   }
 
   incrementCounter() {
@@ -123,14 +104,76 @@ class App extends React.Component {
     this.setState({ renderBox: state })
   }
 
-  render() {
+  setUpQuiz() {
+    this.setState({ isLoading: true },
+      () => {
+        fetch("https://opentdb.com/api.php?amount=10&type=multiple", {
+          method: "get"
+        })
+          .then(resp => {
+            return resp.json();
+          })
+          .then(data => {
+            this.setState((prevState) => {
+              let results = [...data.results];
+              results.map((x) => {
+                x.options = [...x.incorrect_answers, x.correct_answer]
+                // need to shuffle results
+                x.options = _.shuffle(x.options)
+                x.isAnswered = false;
+                return x;
+              })
+              prevState.QuestionsArray = results;
+              prevState.length = data.results.length;
+              prevState.currentIndex = 0;
+              prevState.isCorrect = false;
+              return prevState;
 
-    const Box = this.state.renderBox ? this.renderBox() :
-      (<>
-        <h2> A simple quiz app! </h2>
-        <br></br>
-        <Button size='lg' onClick={() => { this.setRenderBox(true) }}>Start!</Button>
-      </>)
+            })
+          }).then(() => {
+            this.setRenderBox(true)
+          })
+      }
+    )
+  }
+  render() {
+    let Box = ""
+    if (this.state.renderBox) {
+      Box = this.renderBox()
+    } else if (this.state.isLoading) {
+      Box = (
+        <h2>
+          <FontAwesomeIcon icon={faSpinner}></FontAwesomeIcon> Loading...
+        </h2>
+      )
+    } else {
+      Box =
+        (<>
+          <h2> A simple quiz app! </h2>
+          <br></br>
+          <Row className='justify-content-center'>
+            Number of Questions:
+          <select onChange={(e) => {
+              let number = parseInt(e.currentTarget.value);
+              number = number || 10; // if bad input (NaN etc.) arises set default
+              if (number < 0 || number > 15) number = 10; // data validation
+              this.setState({ length: number })
+            }}
+              name='number-of-questions'
+              defaultValue={10}>{
+                [5, 10, 15].map((val, idx) => {
+                  return (
+                    <option value={val} key={idx}>{val}</option>
+                  )
+                })
+              }
+            </select>
+          </Row>
+          <Row className='justify-content-center'>
+            <Button size='lg' onClick={this.setUpQuiz}>Start!</Button>
+          </Row>
+        </>)
+    }
     return (
       <div className="App">
         {/* Header */}
