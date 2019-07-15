@@ -1,9 +1,10 @@
 import React from "react";
 import "./App.css";
 import Header from "./HeaderComponent";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import Box from "./BoxContainer";
 import _ from "lodash";
+import InfoBar from "./QuestionInfoComponent";
 class App extends React.Component {
 
   constructor() {
@@ -11,13 +12,17 @@ class App extends React.Component {
     this.state = {
       QuestionsArray: [],
       length: 0,
-      currentIndex: null
+      currentIndex: null,
+      renderBox: false
     }
     this.incrementCounter = this.incrementCounter.bind(this);
     this.decrementCounter = this.decrementCounter.bind(this);
     this.setAnswered = this.setAnswered.bind(this);
-
+    this.renderBox = this.renderBox.bind(this);
+    this.setRenderBox = this.setRenderBox.bind(this)
+    this.getTotalCorrect = this.getTotalCorrect.bind(this)
   }
+
   componentDidMount() {
     fetch("https://opentdb.com/api.php?amount=10&type=multiple", {
       method: "get"
@@ -38,11 +43,13 @@ class App extends React.Component {
           prevState.QuestionsArray = results;
           prevState.length = data.results.length;
           prevState.currentIndex = 0;
+          prevState.isCorrect = false;
           return prevState;
 
         })
       })
   }
+
   incrementCounter() {
     this.setState((prevState) => {
       return {
@@ -50,6 +57,7 @@ class App extends React.Component {
       }
     })
   }
+
   decrementCounter() {
     this.setState((prevState) => {
       return {
@@ -57,17 +65,77 @@ class App extends React.Component {
       }
     })
   }
+
   setAnswered(idx, selectedAnswer) {
     this.setState((prevState) => {
       let questionsList = [...prevState.QuestionsArray]
       questionsList[idx].isAnswered = true;
       questionsList[idx].answer = selectedAnswer;
+      if (selectedAnswer === questionsList[idx].correct_answer) {
+        questionsList[idx].isCorrect = true;
+      }
       return {
         QuestionsArray: questionsList
       }
     })
   }
+
+  getTotalCorrect() {
+    let x = this.state.QuestionsArray.filter((question) => {
+      return question.isCorrect
+    }).length
+    return x
+  }
+
+  renderBox() {
+    return (
+      <>
+        <Row>
+          <InfoBar
+            totalQuestions={this.state.length}
+            currentQuestion={this.state.currentIndex + 1}
+            totalCorrect={this.getTotalCorrect()}
+          ></InfoBar>
+        </Row>
+        <Row>
+
+          <Box
+            currentQuesitonIndex={this.state.currentIndex}
+            question={
+              this.state.length ? this.state.QuestionsArray[this.state.currentIndex].question : ""
+            }
+            correct_answer={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].correct_answer : ""
+            }
+            answerList={
+              this.state.length ? this.state.QuestionsArray[this.state.currentIndex].options : []
+            }
+            incrementCounter={this.incrementCounter}
+            decrementCounter={this.decrementCounter}
+            canBack={this.state.currentIndex === 0}
+            canForward={this.state.currentIndex !== this.state.length - 1}
+            isAnswered={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].isAnswered : false
+            }
+            setAnswered={this.setAnswered}
+            answerString={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].answer : ""
+            }
+          ></Box>
+        </Row>
+      </>
+    )
+  }
+
+  setRenderBox(state = true) {
+    this.setState({ renderBox: state })
+  }
+
   render() {
+
+    const Box = this.state.renderBox ? this.renderBox() :
+      (<>
+        <h2> A simple quiz app! </h2>
+        <br></br>
+        <Button size='lg' onClick={() => { this.setRenderBox(true) }}>Start!</Button>
+      </>)
     return (
       <div className="App">
         {/* Header */}
@@ -76,28 +144,9 @@ class App extends React.Component {
         <Container fluid={true}>
           <hr />
           <Row>
-            <Col sm={12} lg={12}>
+            <Col sm={12} lg={12} id="MainColumn">
               {/* HERE GOES BOX CONTAINER */}
-              <Box
-                currentQuesitonIndex={this.state.currentIndex}
-                question={
-                  this.state.length ? this.state.QuestionsArray[this.state.currentIndex].question : ""
-                }
-                correct_answer={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].correct_answer : ""
-                }
-                answerList={
-                  this.state.length ? this.state.QuestionsArray[this.state.currentIndex].options : []
-                }
-                incrementCounter={this.incrementCounter}
-                decrementCounter={this.decrementCounter}
-                canBack={this.state.currentIndex === 0}
-                canForward={this.state.currentIndex !== this.state.length - 1}
-                isAnswered={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].isAnswered : false
-                }
-                setAnswered={this.setAnswered}
-                answerString={this.state.length ? this.state.QuestionsArray[this.state.currentIndex].answer : ""
-                }
-              ></Box>
+              {Box}
             </Col>
           </Row>
           <hr />
