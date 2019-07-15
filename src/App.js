@@ -13,14 +13,14 @@ class App extends React.Component {
       QuestionsArray: [],
       length: 0,
       currentIndex: null,
-      renderBox: false
+      renderBox: false,
+      correctAnswerCount: 0
     }
     this.incrementCounter = this.incrementCounter.bind(this);
     this.decrementCounter = this.decrementCounter.bind(this);
     this.setAnswered = this.setAnswered.bind(this);
     this.renderBox = this.renderBox.bind(this);
     this.setRenderBox = this.setRenderBox.bind(this)
-    this.getTotalCorrect = this.getTotalCorrect.bind(this)
   }
 
   componentDidMount() {
@@ -71,20 +71,15 @@ class App extends React.Component {
       let questionsList = [...prevState.QuestionsArray]
       questionsList[idx].isAnswered = true;
       questionsList[idx].answer = selectedAnswer;
+      let ans_count = prevState.correctAnswerCount
       if (selectedAnswer === questionsList[idx].correct_answer) {
-        questionsList[idx].isCorrect = true;
+        ans_count += 1;
       }
       return {
-        QuestionsArray: questionsList
+        QuestionsArray: questionsList,
+        correctAnswerCount: ans_count
       }
     })
-  }
-
-  getTotalCorrect() {
-    let x = this.state.QuestionsArray.filter((question) => {
-      return question.isCorrect
-    }).length
-    return x
   }
 
   renderBox() {
@@ -94,7 +89,7 @@ class App extends React.Component {
           <InfoBar
             totalQuestions={this.state.length}
             currentQuestion={this.state.currentIndex + 1}
-            totalCorrect={this.getTotalCorrect()}
+            totalCorrect={this.state.correctAnswerCount}
           ></InfoBar>
         </Row>
         <Row>
