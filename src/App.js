@@ -1,10 +1,13 @@
 import React from "react";
-import "./App.css";
-import Header from "./HeaderComponent";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import Box from "./BoxContainer";
+
 import _ from "lodash";
+import "./App.css";
+
+import Header from "./HeaderComponent";
+import Box from "./BoxContainer";
 import InfoBar from "./QuestionInfoComponent";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 class App extends React.Component {
@@ -107,7 +110,7 @@ class App extends React.Component {
   setUpQuiz() {
     this.setState({ isLoading: true },
       () => {
-        fetch("https://opentdb.com/api.php?amount=10&type=multiple", {
+        fetch("https://opentdb.com/api.php?amount=" + this.state.length + "&type=multiple", {
           method: "get"
         })
           .then(resp => {
